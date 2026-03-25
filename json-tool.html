@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON 便携工具</title>
+    <style>
+        :root {
+            --bg: #f3efe7;
+            --panel: rgba(255, 252, 245, 0.9);
+            --panel-strong: #fffdf8;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --line: rgba(148, 163, 184, 0.28);
+            --accent: #c55b33;
+            --accent-2: #155e75;
+            --ok: #166534;
+            --warn: #9a3412;
+            --shadow: 0 18px 45px rgba(107, 88, 61, 0.12);
+            --radius: 20px;
+            --body-bg:
+                radial-gradient(circle at top left, rgba(197, 91, 51, 0.18), transparent 28%),
+                radial-gradient(circle at right center, rgba(21, 94, 117, 0.15), transparent 32%),
+                linear-gradient(135deg, #efe6d8, #f7f4ee 45%, #ece7de);
+            --control-bg: linear-gradient(to bottom, rgba(255, 252, 245, 0.98), rgba(255, 252, 245, 0.92));
+            --viewer-bg: #fffefb;
+            --viewer-header-bg: rgba(255, 252, 245, 0.96);
+            --soft-surface: rgba(255, 255, 255, 0.56);
+            --soft-surface-2: rgba(255, 255, 255, 0.5);
+            --soft-surface-3: rgba(255, 255, 255, 0.58);
+            --ghost-bg: rgba(107, 114, 128, 0.1);
+            --secondary-bg: rgba(21, 94, 117, 0.1);
+            --button-text-on-accent: #ffffff;
+            --button-ghost-text: var(--text);
+            --button-secondary-text: var(--accent-2);
+            --code-inline-bg: rgba(21, 94, 117, 0.08);
+            --code-inline-text: #0f766e;
+            --code-block-bg: #f8fafc;
+            --blockquote-bg: rgba(197, 91, 51, 0.06);
+            --blockquote-text: #4b5563;
+            --line-no: #9ca3af;
+            --token-key: #9a3412;
+            --token-string: #166534;
+            --token-number: #1d4ed8;
+            --token-bool: #7c3aed;
+            --token-null: #b91c1c;
+            --error: #b91c1c;
+            --card-border: rgba(255, 255, 255, 0.65);
+            --link: #0f766e;
+        }
+
+        body.dark-mode {
+            --bg: #0b1220;
+            --panel: rgba(15, 23, 42, 0.9);
+            --panel-strong: #111827;
+            --text: #e5eefc;
+            --muted: #94a3b8;
+            --line: rgba(148, 163, 184, 0.22);
+            --accent: #f97316;
+            --accent-2: #67e8f9;
+            --ok: #4ade80;
+            --warn: #fdba74;
+            --shadow: 0 20px 50px rgba(2, 6, 23, 0.5);
+            --body-bg:
+                radial-gradient(circle at top left, rgba(249, 115, 22, 0.16), transparent 24%),
+                radial-gradient(circle at right center, rgba(34, 211, 238, 0.12), transparent 28%),
+                linear-gradient(135deg, #020617, #0f172a 48%, #111827);
+            --control-bg: linear-gradient(to bottom, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
+            --viewer-bg: #0f172a;
+            --viewer-header-bg: rgba(15, 23, 42, 0.96);
+            --soft-surface: rgba(30, 41, 59, 0.88);
+            --soft-surface-2: rgba(30, 41, 59, 0.82);
+            --soft-surface-3: rgba(30, 41, 59, 0.9);
+            --ghost-bg: rgba(148, 163, 184, 0.12);
+            --secondary-bg: rgba(34, 211, 238, 0.14);
+            --button-text-on-accent: #08111f;
+            --button-ghost-text: #e5eefc;
+            --button-secondary-text: #a5f3fc;
+            --code-inline-bg: rgba(34, 211, 238, 0.14);
+            --code-inline-text: #a5f3fc;
+            --code-block-bg: #020617;
+            --blockquote-bg: rgba(249, 115, 22, 0.12);
+            --blockquote-text: #dbeafe;
+            --line-no: #64748b;
+            --token-key: #fdba74;
+            --token-string: #86efac;
+            --token-number: #93c5fd;
+            --token-bool: #c4b5fd;
+            --token-null: #fca5a5;
+            --error: #fca5a5;
+            --card-border: rgba(148, 163, 184, 0.18);
+            --link: #67e8f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            background: var(--body-bg);
+            min-height: 100vh;
+            padding: 24px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .shell {
+            max-width: 1680px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .badge {
+            width: fit-content;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(197, 91, 51, 0.12);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(28px, 4vw, 52px);
+            line-height: 1;
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 720px;
+            line-height: 1.6;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.18fr) minmax(0, 1.08fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: grid;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .panel-controls {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            display: grid;
+            gap: 14px;
+            padding: 18px 18px 0;
+            background: var(--control-bg);
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-body {
+            display: grid;
+            gap: 14px;
+            padding: 0 18px 18px;
+            min-width: 0;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .status {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .status.ok {
+            color: var(--ok);
+        }
+
+        .status.error {
+            color: var(--error);
+        }
+
+        .toolbar,
+        .subtools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button,
+        .file-label {
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            min-height: 42px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+            flex: 0 0 auto;
+        }
+
+        button:hover,
+        .file-label:hover {
+            transform: translateY(-1px);
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: var(--button-text-on-accent);
+        }
+
+        button.secondary,
+        .file-label {
+            background: var(--secondary-bg);
+            color: var(--button-secondary-text);
+        }
+
+        button.ghost {
+            background: var(--ghost-bg);
+            color: var(--button-ghost-text);
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 100%;
+            min-height: 440px;
+            resize: vertical;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--panel-strong);
+            padding: 16px;
+            font: 14px/1.7 Consolas, "Courier New", monospace;
+            color: var(--text);
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: rgba(197, 91, 51, 0.5);
+            box-shadow: 0 0 0 4px rgba(197, 91, 51, 0.1);
+        }
+
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .metric {
+            background: var(--soft-surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .metric span {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .metric strong {
+            font-size: 16px;
+        }
+
+        .viewer {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--viewer-bg);
+            min-height: 596px;
+            max-width: 100%;
+            overflow: auto;
+            padding: 0;
+        }
+
+        .viewer-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            background: var(--viewer-header-bg);
+            backdrop-filter: blur(8px);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .viewer-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .viewer-content {
+            padding: 16px;
+            min-height: 180px;
+            font: 14px/1.75 Consolas, "Courier New", monospace;
+            color: var(--text);
+        }
+
+        pre {
+            margin: 0;
+            padding: 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font: 14px/1.75 Consolas, "Courier New", monospace;
+        }
+
+        .plain-text-view {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .json-tree {
+            display: grid;
+            gap: 2px;
+        }
+
+        .json-tree-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .json-toggle {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 0;
+            min-height: auto;
+            width: 18px;
+            flex: 0 0 18px;
+            line-height: 1.6;
+            transform: none;
+        }
+
+        .json-toggle:hover {
+            color: var(--text);
+            transform: none;
+        }
+
+        .json-toggle-placeholder {
+            width: 18px;
+            flex: 0 0 18px;
+        }
+
+        .json-tree-node {
+            display: grid;
+            gap: 2px;
+        }
+
+        .json-tree-children {
+            margin-left: 26px;
+            padding-left: 12px;
+            border-left: 1px dashed var(--line);
+            display: grid;
+            gap: 2px;
+        }
+
+        .json-summary {
+            color: var(--muted);
+        }
+
+        .json-punctuation {
+            color: var(--muted);
+        }
+
+        .markdown-view {
+            padding: 18px;
+            line-height: 1.75;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        .markdown-view h1,
+        .markdown-view h2,
+        .markdown-view h3,
+        .markdown-view h4,
+        .markdown-view h5,
+        .markdown-view h6 {
+            margin: 0 0 12px;
+            line-height: 1.3;
+        }
+
+        .markdown-view h1 { font-size: 30px; }
+        .markdown-view h2 { font-size: 24px; }
+        .markdown-view h3 { font-size: 20px; }
+        .markdown-view p,
+        .markdown-view ul,
+        .markdown-view ol,
+        .markdown-view blockquote,
+        .markdown-view pre {
+            margin: 0 0 14px;
+        }
+
+        .markdown-view ul,
+        .markdown-view ol {
+            padding-left: 22px;
+        }
+
+        .markdown-view blockquote {
+            padding: 10px 14px;
+            border-left: 4px solid rgba(197, 91, 51, 0.45);
+            background: var(--blockquote-bg);
+            color: var(--blockquote-text);
+            border-radius: 10px;
+        }
+
+        .markdown-view code {
+            background: var(--code-inline-bg);
+            color: var(--code-inline-text);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font: 13px Consolas, "Courier New", monospace;
+        }
+
+        .markdown-view pre {
+            padding: 14px;
+            overflow: auto;
+            background: var(--code-block-bg);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+
+        .markdown-view pre code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        .markdown-view a {
+            color: var(--link);
+        }
+
+        .line-no {
+            color: var(--line-no);
+            display: inline-block;
+            width: 3.2em;
+            user-select: none;
+        }
+
+        .token-key {
+            color: var(--token-key);
+        }
+
+        .token-string {
+            color: var(--token-string);
+        }
+
+        .token-number {
+            color: var(--token-number);
+        }
+
+        .token-bool {
+            color: var(--token-bool);
+        }
+
+        .token-null {
+            color: var(--token-null);
+        }
+
+        .tips {
+            display: grid;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .tips div {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: var(--soft-surface-2);
+            border: 1px solid var(--line);
+        }
+
+        .history-list {
+            display: grid;
+            gap: 10px;
+            max-height: 280px;
+            overflow: auto;
+            min-width: 0;
+        }
+
+        .history-empty,
+        .history-item {
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: var(--soft-surface-3);
+        }
+
+        .history-item {
+            display: grid;
+            gap: 8px;
+        }
+
+        .history-item-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .history-time {
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .history-preview {
+            font: 12px/1.5 Consolas, "Courier New", monospace;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .history-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .history-actions button {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                min-height: 320px;
+            }
+
+            .viewer {
+                min-height: 360px;
+            }
+
+            .meta {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-controls {
+                position: static;
+                padding: 18px 18px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="hero">
+            <div class="badge">Portable JSON Tool</div>
+            <h1>JSON 文本互转与查看</h1>
+            <p>单文件、离线可用。支持 JSON 文本解析、压缩、格式化展示、复制、导入与导出，便于临时携带和本地使用。</p>
+        </section>
+
+        <section class="layout">
+            <div class="card panel">
+                <div class="panel-controls">
+                    <div class="panel-head">
+                        <div class="panel-title">输入 / 输出区</div>
+                        <div id="status" class="status">等待操作</div>
+                    </div>
+
+                    <div class="toolbar">
+                        <button id="parseBtn" class="primary">文本转 JSON</button>
+                        <button id="compressBtn" class="secondary">JSON 压缩文本</button>
+                        <button id="formatBtn" class="secondary">格式化</button>
+                        <button id="restoreEscapesBtn" class="secondary">转义还原</button>
+                        <button id="previewMdBtn" class="secondary">MD 预览</button>
+                        <button id="validateBtn" class="ghost">校验</button>
+                        <button id="clearInputBtn" class="ghost">清空输入</button>
+                        <button id="clearViewerBtn" class="ghost">清空预览</button>
+                        <button id="clearAllBtn" class="ghost">全部清空</button>
+                    </div>
+
+                    <div class="subtools">
+                        <button id="themeToggleBtn" class="ghost">夜间模式</button>
+                        <button id="bindHistoryDirBtn" class="ghost">绑定历史目录</button>
+                        <button id="copyBtn" class="ghost">复制文本</button>
+                        <button id="downloadBtn" class="ghost">导出 JSON</button>
+                        <button id="saveHistoryBtn" class="ghost">保存到历史</button>
+                        <label for="fileInput" class="file-label">导入文件</label>
+                        <input id="fileInput" type="file" accept=".json,.txt,application/json,text/plain">
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <textarea id="jsonInput" spellcheck="false" placeholder='可粘贴 JSON 文本，例如：{"name":"portable","items":[1,2,3]}'></textarea>
+
+                    <div class="meta">
+                        <div class="metric">
+                            <span>字符数</span>
+                            <strong id="charCount">0</strong>
+                        </div>
+                        <div class="metric">
+                            <span>行数</span>
+                            <strong id="lineCount">1</strong>
+                        </div>
+                        <div class="metric">
+                            <span>压缩后长度</span>
+                            <strong id="compactCount">0</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card panel">
+                <div class="panel-controls">
+                    <div class="panel-head">
+                        <div class="panel-title">JSON 查看区</div>
+                        <div id="viewMode" class="status">格式化预览</div>
+                    </div>
+
+                    <div class="history-head">
+                        <div class="panel-title">历史记录</div>
+                        <button id="clearHistoryBtn" class="ghost">清空历史</button>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="viewer">
+                        <div class="viewer-header">
+                            <span>带行号高亮显示</span>
+                            <div class="viewer-header-actions">
+                                <span id="typeInfo">未解析</span>
+                                <button id="copyViewerBtn" class="ghost">复制结果</button>
+                            </div>
+                        </div>
+                        <div id="viewer" class="viewer-content">等待 JSON 内容...</div>
+                    </div>
+
+                    <div class="tips">
+                        <div>“文本转 JSON” 会解析当前文本并以易读格式展示。</div>
+                        <div>“JSON 压缩文本” 会去掉多余空格和换行，适合传输或存储。</div>
+                        <div>“转义还原” 可把 <code>\n</code>、<code>\"</code>、<code>\/</code>、<code>\\</code> 等还原成原始文本。</div>
+                        <div>“MD 预览” 会把当前文本按 Markdown 格式渲染展示。</div>
+                        <div>首次点“绑定历史目录”后，可把历史自动同步到同级目录中的 <code>json-tool-history.jsonl</code>。</div>
+                        <div>历史记录保存在浏览器本地，不上传网络；页面仍是单 HTML 文件，直接双击即可使用。</div>
+                    </div>
+
+                    <div id="historyList" class="history-list">
+                        <div class="history-empty">暂无历史记录</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const input = document.getElementById("jsonInput");
+        const viewer = document.getElementById("viewer");
+        const status = document.getElementById("status");
+        const typeInfo = document.getElementById("typeInfo");
+        const viewMode = document.getElementById("viewMode");
+        const charCount = document.getElementById("charCount");
+        const lineCount = document.getElementById("lineCount");
+        const compactCount = document.getElementById("compactCount");
+        const fileInput = document.getElementById("fileInput");
+        const historyList = document.getElementById("historyList");
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        const bindHistoryDirBtn = document.getElementById("bindHistoryDirBtn");
+        const copyViewerBtn = document.getElementById("copyViewerBtn");
+        const HISTORY_KEY = "portable-json-tool-history";
+        const THEME_KEY = "portable-json-tool-theme";
+        const HANDLE_DB_NAME = "portable-json-tool-db";
+        const HANDLE_STORE_NAME = "handles";
+        const DIRECTORY_HANDLE_KEY = "history-directory-handle";
+        const HISTORY_FILE_NAME = "json-tool-history.jsonl";
+        const HISTORY_LIMIT = 20;
+        let historyItems = [];
+        let boundDirectoryHandle = null;
+        let currentJsonData = null;
+        let currentJsonMode = "";
+        let collapsedJsonPaths = new Set();
+        let currentViewerText = "";
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+
+        function syntaxHighlight(jsonText) {
+            const escaped = escapeHtml(jsonText);
+            return escaped.replace(
+                /("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?/g,
+                (match) => {
+                    let cls = "token-number";
+                    if (match.startsWith('"')) {
+                        cls = match.endsWith(":") ? "token-key" : "token-string";
+                    } else if (match === "true" || match === "false") {
+                        cls = "token-bool";
+                    } else if (match === "null") {
+                        cls = "token-null";
+                    }
+                    return `<span class="${cls}">${match}</span>`;
+                }
+            );
+        }
+
+        function withLineNumbers(htmlText) {
+            const lines = htmlText.split("\n");
+            return lines
+                .map((line, index) => `<span class="line-no">${index + 1}</span>${line || " "}`)
+                .join("\n");
+        }
+
+        function setStatus(text, type) {
+            status.textContent = text;
+            status.className = "status" + (type ? ` ${type}` : "");
+        }
+
+        function applyTheme(theme) {
+            const dark = theme === "dark";
+            document.body.classList.toggle("dark-mode", dark);
+            themeToggleBtn.textContent = dark ? "日间模式" : "夜间模式";
+        }
+
+        function getPreferredTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === "light" || saved === "dark") {
+                return saved;
+            }
+            return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function updateMetrics() {
+            const value = input.value;
+            charCount.textContent = value.length.toString();
+            lineCount.textContent = (value.split(/\r?\n/).length || 1).toString();
+            try {
+                compactCount.textContent = JSON.stringify(JSON.parse(value)).length.toString();
+            } catch {
+                compactCount.textContent = "0";
+            }
+        }
+
+        function renderJson(obj, mode) {
+            currentJsonData = obj;
+            currentJsonMode = mode;
+            currentViewerText = JSON.stringify(obj, null, 2);
+            viewer.innerHTML = renderJsonTree(obj);
+            typeInfo.textContent = Array.isArray(obj) ? `数组 (${obj.length})` : `${typeof obj}`;
+            viewMode.textContent = mode;
+            setStatus("JSON 有效", "ok");
+        }
+
+        function renderPlainText(text, mode) {
+            currentJsonData = null;
+            currentJsonMode = mode;
+            currentViewerText = text;
+            viewer.innerHTML = `<div class="plain-text-view">${withLineNumbers(escapeHtml(text))}</div>`;
+            typeInfo.textContent = "text";
+            viewMode.textContent = mode;
+        }
+
+        function applyInlineMarkdown(text) {
+            return text
+                .replace(/`([^`]+)`/g, "<code>$1</code>")
+                .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+                .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+                .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+        }
+
+        function renderMarkdown(text, mode) {
+            const escaped = escapeHtml(text).replace(/\r\n/g, "\n");
+            const codeBlocks = [];
+            const placeholderText = escaped.replace(/```([\s\S]*?)```/g, (_, code) => {
+                const token = `@@CODEBLOCK${codeBlocks.length}@@`;
+                codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`);
+                return token;
+            });
+
+            const blocks = placeholderText.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+            const html = blocks.map((block) => {
+                if (/^@@CODEBLOCK\d+@@$/.test(block)) {
+                    return block;
+                }
+                if (/^#{1,6}\s/.test(block)) {
+                    const level = block.match(/^#+/)[0].length;
+                    return `<h${level}>${applyInlineMarkdown(block.slice(level).trim())}</h${level}>`;
+                }
+                if (/^>\s/m.test(block)) {
+                    const content = block.split("\n").map((line) => line.replace(/^>\s?/, "")).join("<br>");
+                    return `<blockquote>${applyInlineMarkdown(content)}</blockquote>`;
+                }
+                if (/^[-*]\s/m.test(block)) {
+                    const items = block.split("\n").map((line) => line.replace(/^[-*]\s+/, "").trim()).filter(Boolean);
+                    return `<ul>${items.map((item) => `<li>${applyInlineMarkdown(item)}</li>`).join("")}</ul>`;
+                }
+                if (/^\d+\.\s/m.test(block)) {
+                    const items = block.split("\n").map((line) => line.replace(/^\d+\.\s+/, "").trim()).filter(Boolean);
+                    return `<ol>${items.map((item) => `<li>${applyInlineMarkdown(item)}</li>`).join("")}</ol>`;
+                }
+                return `<p>${applyInlineMarkdown(block.replace(/\n/g, "<br>"))}</p>`;
+            }).join("");
+
+            viewer.innerHTML = `<div class="markdown-view">${html.replace(/@@CODEBLOCK(\d+)@@/g, (_, index) => codeBlocks[Number(index)])}</div>`;
+            currentJsonData = null;
+            currentJsonMode = mode;
+            currentViewerText = text;
+            typeInfo.textContent = "markdown";
+            viewMode.textContent = mode;
+            setStatus("已按 Markdown 展示", "ok");
+        }
+
+        function resetViewer() {
+            currentJsonData = null;
+            currentJsonMode = "";
+            collapsedJsonPaths = new Set();
+            currentViewerText = "";
+            viewer.textContent = "等待 JSON 内容...";
+            typeInfo.textContent = "未解析";
+            viewMode.textContent = "格式化预览";
+        }
+
+        function formatJsonPrimitive(value) {
+            if (typeof value === "string") {
+                return `<span class="token-string">${escapeHtml(JSON.stringify(value))}</span>`;
+            }
+            if (typeof value === "number") {
+                return `<span class="token-number">${String(value)}</span>`;
+            }
+            if (typeof value === "boolean") {
+                return `<span class="token-bool">${String(value)}</span>`;
+            }
+            if (value === null) {
+                return `<span class="token-null">null</span>`;
+            }
+            return escapeHtml(String(value));
+        }
+
+        function getContainerSummary(value) {
+            if (Array.isArray(value)) {
+                return `[${value.length}]`;
+            }
+            return `{${Object.keys(value).length}}`;
+        }
+
+        function renderJsonNode(value, path = "root", keyLabel = "") {
+            const isArray = Array.isArray(value);
+            const isObject = value && typeof value === "object";
+            const keyHtml = keyLabel
+                ? `<span class="token-key">${escapeHtml(JSON.stringify(keyLabel))}</span><span class="json-punctuation">: </span>`
+                : "";
+
+            if (!isObject) {
+                return `
+                    <div class="json-tree-row">
+                        <span class="json-toggle-placeholder"></span>
+                        <div>${keyHtml}${formatJsonPrimitive(value)}</div>
+                    </div>
+                `;
+            }
+
+            const collapsed = collapsedJsonPaths.has(path);
+            const entries = isArray
+                ? value.map((item, index) => [String(index), item])
+                : Object.entries(value);
+            const bracketOpen = isArray ? "[" : "{";
+            const bracketClose = isArray ? "]" : "}";
+
+            if (collapsed) {
+                return `
+                    <div class="json-tree-row">
+                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-label="展开">▸</button>
+                        <div>${keyHtml}<span class="json-punctuation">${bracketOpen}</span><span class="json-summary">${getContainerSummary(value)}</span><span class="json-punctuation">${bracketClose}</span></div>
+                    </div>
+                `;
+            }
+
+            const children = entries.length
+                ? entries.map(([childKey, childValue]) => renderJsonNode(childValue, `${path}.${childKey}`, childKey)).join("")
+                : `<div class="json-tree-row"><span class="json-toggle-placeholder"></span><div class="json-summary">empty</div></div>`;
+
+            return `
+                <div class="json-tree-node">
+                    <div class="json-tree-row">
+                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-label="折叠">▾</button>
+                        <div>${keyHtml}<span class="json-punctuation">${bracketOpen}</span></div>
+                    </div>
+                    <div class="json-tree-children">${children}</div>
+                    <div class="json-tree-row">
+                        <span class="json-toggle-placeholder"></span>
+                        <div><span class="json-punctuation">${bracketClose}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderJsonTree(value) {
+            return `<div class="json-tree">${renderJsonNode(value)}</div>`;
+        }
+
+        function getHistoryFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem(HISTORY_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveHistoryToLocalStorage(items) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
+        }
+
+        function getHistory() {
+            return historyItems;
+        }
+
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleString("zh-CN", { hour12: false });
+        }
+
+        function previewText(text) {
+            return text.replace(/\s+/g, " ").slice(0, 96) || "(空内容)";
+        }
+
+        function historyToJsonl(items) {
+            return items.map((item) => JSON.stringify(item)).join("\n");
+        }
+
+        function parseHistoryJsonl(text) {
+            return text
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .map((line) => JSON.parse(line));
+        }
+
+        function openHandleDb() {
+            return new Promise((resolve, reject) => {
+                if (!("indexedDB" in window)) {
+                    resolve(null);
+                    return;
+                }
+                const request = indexedDB.open(HANDLE_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    if (!request.result.objectStoreNames.contains(HANDLE_STORE_NAME)) {
+                        request.result.createObjectStore(HANDLE_STORE_NAME);
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function idbGet(key) {
+            const db = await openHandleDb();
+            if (!db) {
+                return null;
+            }
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(HANDLE_STORE_NAME, "readonly");
+                const store = tx.objectStore(HANDLE_STORE_NAME);
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result ?? null);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function idbSet(key, value) {
+            const db = await openHandleDb();
+            if (!db) {
+                return;
+            }
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(HANDLE_STORE_NAME, "readwrite");
+                const store = tx.objectStore(HANDLE_STORE_NAME);
+                const request = store.put(value, key);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function verifyDirectoryPermission(handle, write, request) {
+            if (!handle) {
+                return false;
+            }
+            const options = { mode: write ? "readwrite" : "read" };
+            if (await handle.queryPermission(options) === "granted") {
+                return true;
+            }
+            if (!request) {
+                return false;
+            }
+            return (await handle.requestPermission(options)) === "granted";
+        }
+
+        async function storeDirectoryHandle(handle) {
+            boundDirectoryHandle = handle;
+            await idbSet(DIRECTORY_HANDLE_KEY, handle);
+        }
+
+        async function restoreStoredDirectoryHandle() {
+            try {
+                const handle = await idbGet(DIRECTORY_HANDLE_KEY);
+                if (handle) {
+                    boundDirectoryHandle = handle;
+                }
+            } catch {
+                boundDirectoryHandle = null;
+            }
+        }
+
+        async function ensureHistoryFileHandle(create = true) {
+            if (!boundDirectoryHandle) {
+                return null;
+            }
+            return boundDirectoryHandle.getFileHandle(HISTORY_FILE_NAME, { create });
+        }
+
+        async function persistHistoryToFile(items) {
+            if (!boundDirectoryHandle) {
+                return false;
+            }
+            const granted = await verifyDirectoryPermission(boundDirectoryHandle, true, false);
+            if (!granted) {
+                return false;
+            }
+            const fileHandle = await ensureHistoryFileHandle(true);
+            const writable = await fileHandle.createWritable();
+            await writable.write(historyToJsonl(items));
+            await writable.close();
+            return true;
+        }
+
+        async function loadHistoryFromBoundFile() {
+            if (!boundDirectoryHandle) {
+                return false;
+            }
+            const granted = await verifyDirectoryPermission(boundDirectoryHandle, false, false);
+            if (!granted) {
+                return false;
+            }
+            try {
+                const fileHandle = await ensureHistoryFileHandle(false);
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+                if (!text.trim()) {
+                    historyItems = [];
+                    saveHistoryToLocalStorage(historyItems);
+                    return true;
+                }
+                historyItems = parseHistoryJsonl(text).slice(0, HISTORY_LIMIT);
+                saveHistoryToLocalStorage(historyItems);
+                return true;
+            } catch (error) {
+                if (error && error.name === "NotFoundError") {
+                    return false;
+                }
+                throw error;
+            }
+        }
+
+        async function setHistory(items, options = {}) {
+            const { persistFile = true } = options;
+            historyItems = items.slice(0, HISTORY_LIMIT);
+            saveHistoryToLocalStorage(historyItems);
+            renderHistory();
+            if (persistFile) {
+                await persistHistoryToFile(historyItems);
+            }
+        }
+
+        function renderHistory() {
+            const items = getHistory();
+            if (!items.length) {
+                historyList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+                return;
+            }
+
+            historyList.innerHTML = items.map((item) => `
+                <div class="history-item" data-id="${item.id}">
+                    <div class="history-item-head">
+                        <div class="history-title">${item.title}</div>
+                        <div class="history-time">${formatTime(item.timestamp)}</div>
+                    </div>
+                    <div class="history-preview">${escapeHtml(previewText(item.content))}</div>
+                    <div class="history-actions">
+                        <button type="button" class="secondary" data-action="restore" data-id="${item.id}">恢复</button>
+                        <button type="button" class="ghost" data-action="delete" data-id="${item.id}">删除</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        async function addCurrentToHistory() {
+            const content = input.value;
+            if (!content.trim()) {
+                setStatus("空内容不保存历史", "error");
+                return;
+            }
+
+            const now = Date.now();
+            const items = getHistory();
+            items.unshift({
+                id: now.toString(),
+                title: `记录 ${items.length + 1}`,
+                timestamp: now,
+                content
+            });
+            await setHistory(items, { persistFile: true });
+            setStatus(boundDirectoryHandle ? "已保存到历史并同步 jsonl" : "已保存到历史", "ok");
+        }
+
+        function parseJsonFromInput() {
+            const raw = input.value.trim();
+            if (!raw) {
+                throw new Error("输入为空");
+            }
+            return JSON.parse(raw);
+        }
+
+        function restoreEscapedText(raw) {
+            const text = raw.trim();
+            if (!text) {
+                throw new Error("输入为空");
+            }
+
+            if (text.startsWith('"') && text.endsWith('"')) {
+                return JSON.parse(text);
+            }
+
+            const normalized = text
+                .replace(/\r/g, "\\r")
+                .replace(/\n/g, "\\n")
+                .replace(/\t/g, "\\t");
+
+            return JSON.parse(`"${normalized}"`);
+        }
+
+        document.getElementById("parseBtn").addEventListener("click", () => {
+            try {
+                const obj = parseJsonFromInput();
+                input.value = JSON.stringify(obj, null, 2);
+                renderJson(obj, "格式化预览");
+                updateMetrics();
+            } catch (error) {
+                setStatus(`解析失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("compressBtn").addEventListener("click", () => {
+            try {
+                const obj = parseJsonFromInput();
+                const compact = JSON.stringify(obj);
+                input.value = compact;
+                renderJson(obj, "压缩源对应预览");
+                updateMetrics();
+            } catch (error) {
+                setStatus(`压缩失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("formatBtn").addEventListener("click", () => {
+            try {
+                const obj = parseJsonFromInput();
+                input.value = JSON.stringify(obj, null, 2);
+                renderJson(obj, "格式化预览");
+                updateMetrics();
+            } catch (error) {
+                setStatus(`格式化失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("restoreEscapesBtn").addEventListener("click", () => {
+            try {
+                const restored = restoreEscapedText(input.value);
+                input.value = restored;
+                updateMetrics();
+
+                try {
+                    const parsed = JSON.parse(restored);
+                    renderJson(parsed, "转义还原后 JSON 预览");
+                } catch {
+                    renderPlainText(restored, "转义还原后文本预览");
+                    setStatus("已还原转义文本", "ok");
+                }
+            } catch (error) {
+                setStatus(`还原失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("previewMdBtn").addEventListener("click", () => {
+            const text = input.value.trim();
+            if (!text) {
+                setStatus("输入为空", "error");
+                return;
+            }
+            renderMarkdown(input.value, "Markdown 预览");
+        });
+
+        document.getElementById("validateBtn").addEventListener("click", () => {
+            try {
+                const obj = parseJsonFromInput();
+                renderJson(obj, "校验通过预览");
+                updateMetrics();
+            } catch (error) {
+                setStatus(`校验失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("clearInputBtn").addEventListener("click", () => {
+            input.value = "";
+            updateMetrics();
+            setStatus("已清空输入");
+        });
+
+        document.getElementById("clearViewerBtn").addEventListener("click", () => {
+            resetViewer();
+            setStatus("已清空预览");
+        });
+
+        document.getElementById("clearAllBtn").addEventListener("click", () => {
+            input.value = "";
+            resetViewer();
+            setStatus("已全部清空");
+            updateMetrics();
+        });
+
+        document.getElementById("copyBtn").addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(input.value);
+                setStatus("已复制到剪贴板", "ok");
+            } catch {
+                setStatus("复制失败，请手动复制", "error");
+            }
+        });
+
+        document.getElementById("downloadBtn").addEventListener("click", () => {
+            const blob = new Blob([input.value], { type: "application/json;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "data.json";
+            link.click();
+            URL.revokeObjectURL(url);
+            setStatus("已导出 JSON 文件", "ok");
+        });
+
+        fileInput.addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            try {
+                input.value = await file.text();
+                setStatus(`已导入：${file.name}`, "ok");
+                updateMetrics();
+            } catch (error) {
+                setStatus(`导入失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("saveHistoryBtn").addEventListener("click", async () => {
+            try {
+                await addCurrentToHistory();
+            } catch (error) {
+                setStatus(`保存历史失败：${error.message}`, "error");
+            }
+        });
+
+        themeToggleBtn.addEventListener("click", () => {
+            const nextTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
+            localStorage.setItem(THEME_KEY, nextTheme);
+            applyTheme(nextTheme);
+            setStatus(nextTheme === "dark" ? "已切换到夜间模式" : "已切换到日间模式", "ok");
+        });
+
+        bindHistoryDirBtn.addEventListener("click", async () => {
+            if (!("showDirectoryPicker" in window)) {
+                setStatus("当前浏览器不支持目录授权", "error");
+                return;
+            }
+            try {
+                const handle = await window.showDirectoryPicker({ mode: "readwrite" });
+                const granted = await verifyDirectoryPermission(handle, true, true);
+                if (!granted) {
+                    setStatus("目录权限未授予", "error");
+                    return;
+                }
+                await storeDirectoryHandle(handle);
+                await persistHistoryToFile(historyItems);
+                setStatus(`已绑定目录并启用 ${HISTORY_FILE_NAME} 自动同步`, "ok");
+            } catch (error) {
+                if (error && error.name === "AbortError") {
+                    setStatus("已取消绑定目录");
+                    return;
+                }
+                setStatus(`绑定目录失败：${error.message}`, "error");
+            }
+        });
+
+        document.getElementById("clearHistoryBtn").addEventListener("click", async () => {
+            try {
+                await setHistory([]);
+                setStatus("已清空历史");
+            } catch (error) {
+                setStatus(`清空历史失败：${error.message}`, "error");
+            }
+        });
+
+        historyList.addEventListener("click", async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+
+            const action = target.dataset.action;
+            const id = target.dataset.id;
+            if (!action || !id) {
+                return;
+            }
+
+            const items = getHistory();
+            if (action === "restore") {
+                const item = items.find((entry) => entry.id === id);
+                if (!item) {
+                    setStatus("历史记录不存在", "error");
+                    return;
+                }
+                input.value = item.content;
+                updateMetrics();
+                setStatus("已恢复历史记录", "ok");
+                return;
+            }
+
+            if (action === "delete") {
+                try {
+                    await setHistory(items.filter((entry) => entry.id !== id));
+                    setStatus("已删除该条历史");
+                } catch (error) {
+                    setStatus(`删除历史失败：${error.message}`, "error");
+                }
+            }
+        });
+
+        viewer.addEventListener("click", (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+
+            const path = target.dataset.togglePath;
+            if (!path || currentJsonData === null) {
+                return;
+            }
+
+            if (collapsedJsonPaths.has(path)) {
+                collapsedJsonPaths.delete(path);
+            } else {
+                collapsedJsonPaths.add(path);
+            }
+            renderJson(currentJsonData, currentJsonMode || "格式化预览");
+        });
+
+        copyViewerBtn.addEventListener("click", async () => {
+            if (!currentViewerText) {
+                setStatus("当前没有可复制的查看结果", "error");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(currentViewerText);
+                setStatus("已复制查看结果", "ok");
+            } catch {
+                setStatus("复制查看结果失败", "error");
+            }
+        });
+
+        input.addEventListener("input", updateMetrics);
+
+        async function initApp() {
+            applyTheme(getPreferredTheme());
+            historyItems = getHistoryFromLocalStorage();
+            renderHistory();
+            updateMetrics();
+
+            await restoreStoredDirectoryHandle();
+            if (boundDirectoryHandle) {
+                try {
+                    const loaded = await loadHistoryFromBoundFile();
+                    if (loaded) {
+                        renderHistory();
+                        setStatus(`已自动加载 ${HISTORY_FILE_NAME}`, "ok");
+                    }
+                } catch (error) {
+                    setStatus(`自动加载历史失败：${error.message}`, "error");
+                }
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+</html>

@@ -262,8 +262,10 @@
         textarea {
             width: 100%;
             max-width: 100%;
-            min-height: 440px;
-            resize: vertical;
+            min-height: 160px;
+            height: 160px;
+            resize: none;
+            overflow-y: hidden;
             border: 1px solid var(--line);
             border-radius: 16px;
             background: var(--panel-strong);
@@ -279,27 +281,31 @@
         }
 
         .meta {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line);
         }
 
         .metric {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
             background: var(--soft-surface);
             border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 12px 14px;
+            border-radius: 999px;
+            padding: 6px 12px;
         }
 
         .metric span {
-            display: block;
             font-size: 12px;
             color: var(--muted);
-            margin-bottom: 6px;
         }
 
         .metric strong {
-            font-size: 16px;
+            font-size: 14px;
+            font-variant-numeric: tabular-nums;
         }
 
         .viewer {
@@ -581,26 +587,56 @@
             display: none;
         }
 
+        .back-to-top {
+            position: fixed;
+            right: 24px;
+            bottom: 32px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            min-height: auto;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--button-text-on-accent);
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease, background 0.18s ease;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-to-top.visible:hover {
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 980px) {
             .layout {
                 grid-template-columns: 1fr;
-            }
-
-            textarea {
-                min-height: 320px;
             }
 
             .viewer {
                 min-height: 360px;
             }
 
-            .meta {
-                grid-template-columns: 1fr;
-            }
-
             .panel-controls {
                 position: static;
                 padding: 18px 18px 0;
+            }
+
+            .back-to-top {
+                right: 16px;
+                bottom: 20px;
             }
         }
     </style>
@@ -642,10 +678,6 @@
                         <label for="fileInput" class="file-label">导入文件</label>
                         <input id="fileInput" type="file" accept=".json,.txt,application/json,text/plain">
                     </div>
-                </div>
-
-                <div class="panel-body">
-                    <textarea id="jsonInput" spellcheck="false" placeholder='可粘贴 JSON 文本，例如：{"name":"portable","items":[1,2,3]}'></textarea>
 
                     <div class="meta">
                         <div class="metric">
@@ -660,7 +692,15 @@
                             <span>压缩后长度</span>
                             <strong id="compactCount">0</strong>
                         </div>
+                        <div class="metric">
+                            <span>估算 Token</span>
+                            <strong id="tokenCount">0</strong>
+                        </div>
                     </div>
+                </div>
+
+                <div class="panel-body">
+                    <textarea id="jsonInput" spellcheck="false" placeholder='可粘贴 JSON 文本，例如：{"name":"portable","items":[1,2,3]}'></textarea>
                 </div>
             </div>
 
@@ -706,6 +746,8 @@
         </section>
     </div>
 
+    <button id="backToTopBtn" class="back-to-top" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
+
     <script>
         const input = document.getElementById("jsonInput");
         const viewer = document.getElementById("viewer");
@@ -715,6 +757,7 @@
         const charCount = document.getElementById("charCount");
         const lineCount = document.getElementById("lineCount");
         const compactCount = document.getElementById("compactCount");
+        const tokenCount = document.getElementById("tokenCount");
         const fileInput = document.getElementById("fileInput");
         const historyList = document.getElementById("historyList");
         const themeToggleBtn = document.getElementById("themeToggleBtn");
@@ -785,10 +828,61 @@
             return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
 
+        const INPUT_MIN_HEIGHT = 160;
+
+        function autoResizeInput() {
+            input.style.height = "auto";
+            const nextHeight = Math.max(input.scrollHeight, INPUT_MIN_HEIGHT);
+            input.style.height = `${nextHeight}px`;
+        }
+
+        function isCjkCharacter(char) {
+            return /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff\uac00-\ud7af]/.test(char);
+        }
+
+        function estimateTokenCount(text) {
+            let total = 0;
+            let latinRunLength = 0;
+
+            const flushLatinRun = () => {
+                if (!latinRunLength) {
+                    return;
+                }
+                total += Math.ceil(latinRunLength / 4);
+                latinRunLength = 0;
+            };
+
+            for (const char of text) {
+                if (/\s/.test(char)) {
+                    flushLatinRun();
+                    continue;
+                }
+
+                if (isCjkCharacter(char)) {
+                    flushLatinRun();
+                    total += 1;
+                    continue;
+                }
+
+                if (/[A-Za-z0-9_]/.test(char)) {
+                    latinRunLength += 1;
+                    continue;
+                }
+
+                flushLatinRun();
+                total += 0.5;
+            }
+
+            flushLatinRun();
+            return Math.ceil(total);
+        }
+
         function updateMetrics() {
             const value = input.value;
+            autoResizeInput();
             charCount.textContent = value.length.toString();
             lineCount.textContent = (value.split(/\r?\n/).length || 1).toString();
+            tokenCount.textContent = estimateTokenCount(value).toString();
             try {
                 compactCount.textContent = JSON.stringify(JSON.parse(value)).length.toString();
             } catch {
@@ -1432,6 +1526,27 @@
         });
 
         input.addEventListener("input", updateMetrics);
+
+        input.addEventListener("paste", () => {
+            requestAnimationFrame(() => {
+                updateMetrics();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+        });
+
+        const backToTopBtn = document.getElementById("backToTopBtn");
+
+        function updateBackToTopVisibility() {
+            backToTopBtn.classList.toggle("visible", window.scrollY > 320);
+        }
+
+        backToTopBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        window.addEventListener("scroll", updateBackToTopVisibility, { passive: true });
+        window.addEventListener("resize", autoResizeInput, { passive: true });
+        updateBackToTopVisibility();
 
         async function initApp() {
             applyTheme(getPreferredTheme());

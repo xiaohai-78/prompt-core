@@ -280,6 +280,11 @@
             box-shadow: 0 0 0 4px rgba(197, 91, 51, 0.1);
         }
 
+        textarea.drag-over {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(197, 91, 51, 0.18);
+        }
+
         .meta {
             display: flex;
             flex-wrap: wrap;
@@ -620,6 +625,215 @@
             transform: translateY(-2px);
         }
 
+        .doc-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .doc-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px 6px 12px;
+            border-radius: 12px 12px 0 0;
+            border: 1px solid var(--line);
+            border-bottom: none;
+            background: var(--soft-surface-2);
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            max-width: 220px;
+        }
+
+        .doc-tab.active {
+            background: var(--panel-strong);
+            color: var(--text);
+            box-shadow: 0 -2px 8px rgba(107, 88, 61, 0.06);
+        }
+
+        .doc-tab-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .doc-tab-name[contenteditable="true"] {
+            cursor: text;
+            border-bottom: 1px dashed var(--accent);
+        }
+
+        .doc-tab-close {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            width: 18px;
+            height: 18px;
+            min-height: auto;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0.6;
+        }
+
+        .doc-tab-close:hover {
+            opacity: 1;
+            background: var(--ghost-bg);
+            transform: none;
+        }
+
+        .doc-tab-add {
+            border: 1px dashed var(--line);
+            background: transparent;
+            color: var(--muted);
+            min-height: auto;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        button.flash {
+            background: var(--ok) !important;
+            color: #fff !important;
+        }
+
+        .diff-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--line);
+            background: var(--viewer-header-bg);
+        }
+
+        .diff-controls select {
+            flex: 1 1 120px;
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px 10px;
+            background: var(--panel-strong);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .diff-controls button {
+            min-height: 38px;
+            padding: 8px 12px;
+        }
+
+        .diff-view {
+            display: grid;
+            font: 13px/1.7 Consolas, "Courier New", monospace;
+        }
+
+        .diff-row {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .diff-sign {
+            flex: 0 0 1.2em;
+            user-select: none;
+            color: var(--muted);
+        }
+
+        .diff-text {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .diff-add {
+            background: rgba(22, 101, 52, 0.14);
+        }
+
+        .diff-add .diff-sign {
+            color: var(--ok);
+        }
+
+        .diff-del {
+            background: rgba(185, 28, 28, 0.14);
+        }
+
+        .diff-del .diff-sign {
+            color: var(--error);
+        }
+
+        .tips[open] summary {
+            margin-bottom: 8px;
+        }
+
+        .tips summary {
+            cursor: pointer;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            list-style: none;
+        }
+
+        .tips summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .tips summary::before {
+            content: "▸ ";
+            color: var(--muted);
+        }
+
+        .tips[open] summary::before {
+            content: "▾ ";
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translate(-50%, 16px);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            max-width: min(92vw, 460px);
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: var(--panel-strong);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            color: var(--text);
+            font-size: 13px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0);
+        }
+
+        .toast.ok { border-color: rgba(22, 101, 52, 0.5); }
+        .toast.error { border-color: rgba(185, 28, 28, 0.5); }
+
+        .toast-action {
+            min-height: auto;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: var(--button-text-on-accent);
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
         @media (max-width: 980px) {
             .layout {
                 grid-template-columns: 1fr;
@@ -657,26 +871,26 @@
                         <div id="status" class="status">等待操作</div>
                     </div>
 
+                    <div id="docTabs" class="doc-tabs"></div>
+
                     <div class="toolbar">
-                        <button id="parseBtn" class="primary">文本转 JSON</button>
-                        <button id="compressBtn" class="secondary">JSON 压缩文本</button>
-                        <button id="formatBtn" class="secondary">格式化</button>
+                        <button id="formatBtn" class="primary" title="Ctrl/⌘ + Enter">格式化</button>
+                        <button id="compressBtn" class="secondary">压缩文本</button>
                         <button id="restoreEscapesBtn" class="secondary">转义还原</button>
                         <button id="previewMdBtn" class="secondary">MD 预览</button>
-                        <button id="validateBtn" class="ghost">校验</button>
-                        <button id="clearInputBtn" class="ghost">清空输入</button>
-                        <button id="clearViewerBtn" class="ghost">清空预览</button>
-                        <button id="clearAllBtn" class="ghost">全部清空</button>
+                        <button id="diffBtn" class="secondary">差异对比</button>
                     </div>
 
                     <div class="subtools">
-                        <button id="themeToggleBtn" class="ghost">夜间模式</button>
-                        <button id="bindHistoryDirBtn" class="ghost">绑定历史目录</button>
                         <button id="copyBtn" class="ghost">复制文本</button>
                         <button id="downloadBtn" class="ghost">导出 JSON</button>
                         <button id="saveHistoryBtn" class="ghost">保存到历史</button>
                         <label for="fileInput" class="file-label">导入文件</label>
                         <input id="fileInput" type="file" accept=".json,.txt,application/json,text/plain">
+                        <button id="clearInputBtn" class="ghost">清空输入</button>
+                        <button id="clearAllBtn" class="ghost">全部清空</button>
+                        <button id="themeToggleBtn" class="ghost">夜间模式</button>
+                        <button id="bindHistoryDirBtn" class="ghost">绑定历史目录</button>
                     </div>
 
                     <div class="meta">
@@ -723,20 +937,30 @@
                             <span>带行号高亮显示</span>
                             <div class="viewer-header-actions">
                                 <span id="typeInfo">未解析</span>
-                                <button id="copyViewerBtn" class="ghost">复制结果</button>
+                                <button id="expandAllBtn" class="ghost" hidden>展开全部</button>
+                                <button id="collapseAllBtn" class="ghost" hidden>折叠全部</button>
+                                <button id="copyViewerBtn" class="ghost" title="Ctrl/⌘ + Shift + C">复制结果</button>
                             </div>
+                        </div>
+                        <div id="diffControls" class="diff-controls" hidden>
+                            <select id="diffLeft" aria-label="对比左侧文档"></select>
+                            <button id="diffSwap" class="ghost" title="交换两侧">⇄</button>
+                            <select id="diffRight" aria-label="对比右侧文档"></select>
+                            <button id="diffClose" class="ghost">退出对比</button>
                         </div>
                         <div id="viewer" class="viewer-content">等待 JSON 内容...</div>
                     </div>
 
-                    <div class="tips">
-                        <div>“文本转 JSON” 会解析当前文本并以易读格式展示。</div>
-                        <div>“JSON 压缩文本” 会去掉多余空格和换行，适合传输或存储。</div>
-                        <div>“转义还原” 可把 <code>\n</code>、<code>\"</code>、<code>\/</code>、<code>\\</code> 等还原成原始文本。</div>
-                        <div>“MD 预览” 会把当前文本按 Markdown 格式渲染展示。</div>
+                    <details class="tips">
+                        <summary>使用说明</summary>
+                        <div>“格式化”会解析当前文本并以易读格式展示（快捷键 Ctrl/⌘ + Enter）；粘贴合法 JSON 会自动格式化。</div>
+                        <div>“压缩文本”会去掉多余空格和换行，适合传输或存储。</div>
+                        <div>“转义还原”可把 <code>\n</code>、<code>\"</code>、<code>\/</code>、<code>\\</code> 等还原成原始文本。</div>
+                        <div>“MD 预览”会把当前文本按 Markdown 格式渲染展示。</div>
+                        <div>顶部标签可管理多个文本，双击标签名可重命名；“差异对比”可比较任意两个文本。</div>
                         <div>首次点“绑定历史目录”后，可把历史自动同步到同级目录中的 <code>json-tool-history.jsonl</code>。</div>
-                        <div>历史记录保存在浏览器本地，不上传网络；页面仍是单 HTML 文件，直接双击即可使用。</div>
-                    </div>
+                        <div>文本与历史均保存在浏览器本地，不上传网络；页面仍是单 HTML 文件，直接双击即可使用。</div>
+                    </details>
 
                     <div id="historyList" class="history-list">
                         <div class="history-empty">暂无历史记录</div>
@@ -747,6 +971,8 @@
     </div>
 
     <button id="backToTopBtn" class="back-to-top" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script>
         const input = document.getElementById("jsonInput");
@@ -763,19 +989,39 @@
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         const bindHistoryDirBtn = document.getElementById("bindHistoryDirBtn");
         const copyViewerBtn = document.getElementById("copyViewerBtn");
+        const docTabs = document.getElementById("docTabs");
+        const toast = document.getElementById("toast");
+        const expandAllBtn = document.getElementById("expandAllBtn");
+        const collapseAllBtn = document.getElementById("collapseAllBtn");
+        const diffBtn = document.getElementById("diffBtn");
+        const diffControls = document.getElementById("diffControls");
+        const diffLeft = document.getElementById("diffLeft");
+        const diffRight = document.getElementById("diffRight");
+        const diffSwap = document.getElementById("diffSwap");
+        const diffClose = document.getElementById("diffClose");
         const HISTORY_KEY = "portable-json-tool-history";
         const THEME_KEY = "portable-json-tool-theme";
+        const DOCS_KEY = "portable-json-tool-docs";
         const HANDLE_DB_NAME = "portable-json-tool-db";
         const HANDLE_STORE_NAME = "handles";
         const DIRECTORY_HANDLE_KEY = "history-directory-handle";
         const HISTORY_FILE_NAME = "json-tool-history.jsonl";
         const HISTORY_LIMIT = 20;
+        const DIFF_MAX_LINES = 4000;
         let historyItems = [];
         let boundDirectoryHandle = null;
         let currentJsonData = null;
         let currentJsonMode = "";
         let collapsedJsonPaths = new Set();
         let currentViewerText = "";
+        let documents = [];
+        let activeDocId = null;
+        let diffMode = false;
+        let persistTimer = null;
+
+        function createId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
 
         function escapeHtml(text) {
             return text
@@ -812,6 +1058,215 @@
         function setStatus(text, type) {
             status.textContent = text;
             status.className = "status" + (type ? ` ${type}` : "");
+        }
+
+        let toastTimer = null;
+
+        function hideToast() {
+            toast.className = "toast";
+        }
+
+        function showToast(message, options = {}) {
+            const { actionLabel, onAction, duration = 4200, type = "" } = options;
+            toast.innerHTML = "";
+            const msg = document.createElement("span");
+            msg.className = "toast-msg";
+            msg.textContent = message;
+            toast.appendChild(msg);
+            if (actionLabel && typeof onAction === "function") {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "toast-action";
+                btn.textContent = actionLabel;
+                btn.addEventListener("click", () => {
+                    hideToast();
+                    onAction();
+                });
+                toast.appendChild(btn);
+            }
+            toast.className = "toast visible" + (type ? ` ${type}` : "");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, duration);
+        }
+
+        function flashButton(btn, text) {
+            if (!btn.dataset.label) {
+                btn.dataset.label = btn.textContent;
+            }
+            btn.textContent = text;
+            btn.classList.add("flash");
+            clearTimeout(btn._flashTimer);
+            btn._flashTimer = setTimeout(() => {
+                btn.textContent = btn.dataset.label;
+                btn.classList.remove("flash");
+            }, 1400);
+        }
+
+        function activeDoc() {
+            return documents.find((doc) => doc.id === activeDocId) || null;
+        }
+
+        function syncActiveContent() {
+            const doc = activeDoc();
+            if (doc) {
+                doc.content = input.value;
+            }
+        }
+
+        function persistDocs() {
+            try {
+                localStorage.setItem(DOCS_KEY, JSON.stringify({ docs: documents, activeId: activeDocId }));
+            } catch {
+                /* storage may be full or unavailable */
+            }
+        }
+
+        function schedulePersistDocs() {
+            clearTimeout(persistTimer);
+            persistTimer = setTimeout(persistDocs, 300);
+        }
+
+        function loadDocs() {
+            try {
+                const raw = localStorage.getItem(DOCS_KEY);
+                const data = raw ? JSON.parse(raw) : null;
+                if (data && Array.isArray(data.docs) && data.docs.length) {
+                    documents = data.docs.map((doc) => ({
+                        id: doc.id || createId(),
+                        name: doc.name || "未命名",
+                        content: typeof doc.content === "string" ? doc.content : ""
+                    }));
+                    activeDocId = documents.some((doc) => doc.id === data.activeId)
+                        ? data.activeId
+                        : documents[0].id;
+                    return;
+                }
+            } catch {
+                /* fall through to default */
+            }
+            const id = createId();
+            documents = [{ id, name: "文档 1", content: "" }];
+            activeDocId = id;
+        }
+
+        function nextDocName() {
+            let max = 0;
+            for (const doc of documents) {
+                const match = /^文档 (\d+)$/.exec(doc.name);
+                if (match) {
+                    max = Math.max(max, Number(match[1]));
+                }
+            }
+            return `文档 ${max + 1}`;
+        }
+
+        function renderTabs() {
+            docTabs.innerHTML = documents.map((doc) => `
+                <div class="doc-tab${doc.id === activeDocId ? " active" : ""}" data-id="${doc.id}" title="${escapeHtml(doc.name)}">
+                    <span class="doc-tab-name" data-id="${doc.id}">${escapeHtml(doc.name)}</span>
+                    <button type="button" class="doc-tab-close" data-close="${doc.id}" aria-label="关闭文档">×</button>
+                </div>
+            `).join("") + '<button type="button" class="doc-tab-add" id="addDocBtn" aria-label="新建文档">+</button>';
+        }
+
+        function switchDoc(id) {
+            if (id === activeDocId) {
+                return;
+            }
+            syncActiveContent();
+            persistDocs();
+            activeDocId = id;
+            const doc = activeDoc();
+            input.value = doc ? doc.content : "";
+            if (diffMode) {
+                exitDiffMode();
+            }
+            renderTabs();
+            updateMetrics();
+            resetViewer();
+            setStatus(`已切换到 ${doc ? doc.name : ""}`);
+        }
+
+        function addDoc() {
+            syncActiveContent();
+            const id = createId();
+            documents.push({ id, name: nextDocName(), content: "" });
+            activeDocId = id;
+            input.value = "";
+            persistDocs();
+            renderTabs();
+            updateMetrics();
+            resetViewer();
+            input.focus();
+            setStatus("已新建文档", "ok");
+        }
+
+        function closeDoc(id) {
+            const index = documents.findIndex((doc) => doc.id === id);
+            if (index < 0) {
+                return;
+            }
+            const [removed] = documents.splice(index, 1);
+            if (!documents.length) {
+                const newId = createId();
+                documents.push({ id: newId, name: "文档 1", content: "" });
+                activeDocId = newId;
+            } else if (activeDocId === id) {
+                activeDocId = documents[Math.max(0, index - 1)].id;
+            }
+            input.value = activeDoc() ? activeDoc().content : "";
+            if (diffMode) {
+                exitDiffMode();
+            }
+            persistDocs();
+            renderTabs();
+            updateMetrics();
+            resetViewer();
+            showToast(`已关闭 ${removed.name}`, {
+                actionLabel: "撤销",
+                onAction: () => {
+                    documents.splice(Math.min(index, documents.length), 0, removed);
+                    activeDocId = removed.id;
+                    input.value = removed.content;
+                    persistDocs();
+                    renderTabs();
+                    updateMetrics();
+                    resetViewer();
+                }
+            });
+        }
+
+        function renameDoc(span) {
+            const id = span.dataset.id;
+            const doc = documents.find((entry) => entry.id === id);
+            if (!doc) {
+                return;
+            }
+            span.contentEditable = "true";
+            span.focus();
+            const range = document.createRange();
+            range.selectNodeContents(span);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            const commit = () => {
+                span.contentEditable = "false";
+                const name = span.textContent.trim().slice(0, 40) || doc.name;
+                doc.name = name;
+                persistDocs();
+                renderTabs();
+            };
+            span.addEventListener("blur", commit, { once: true });
+            span.addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    span.blur();
+                } else if (event.key === "Escape") {
+                    span.textContent = doc.name;
+                    span.blur();
+                }
+            });
         }
 
         function applyTheme(theme) {
@@ -886,27 +1341,40 @@
             try {
                 compactCount.textContent = JSON.stringify(JSON.parse(value)).length.toString();
             } catch {
-                compactCount.textContent = "0";
+                compactCount.textContent = value.trim() ? "—" : "0";
             }
         }
 
+        function setTreeControlsVisible(visible) {
+            expandAllBtn.hidden = !visible;
+            collapseAllBtn.hidden = !visible;
+        }
+
         function renderJson(obj, mode) {
+            if (diffMode) {
+                exitDiffMode();
+            }
             currentJsonData = obj;
             currentJsonMode = mode;
             currentViewerText = JSON.stringify(obj, null, 2);
             viewer.innerHTML = renderJsonTree(obj);
             typeInfo.textContent = Array.isArray(obj) ? `数组 (${obj.length})` : `${typeof obj}`;
             viewMode.textContent = mode;
+            setTreeControlsVisible(obj !== null && typeof obj === "object");
             setStatus("JSON 有效", "ok");
         }
 
         function renderPlainText(text, mode) {
+            if (diffMode) {
+                exitDiffMode();
+            }
             currentJsonData = null;
             currentJsonMode = mode;
             currentViewerText = text;
             viewer.innerHTML = `<div class="plain-text-view">${withLineNumbers(escapeHtml(text))}</div>`;
             typeInfo.textContent = "text";
             viewMode.textContent = mode;
+            setTreeControlsVisible(false);
         }
 
         function applyInlineMarkdown(text) {
@@ -951,12 +1419,16 @@
                 return `<p>${applyInlineMarkdown(block.replace(/\n/g, "<br>"))}</p>`;
             }).join("");
 
+            if (diffMode) {
+                exitDiffMode();
+            }
             viewer.innerHTML = `<div class="markdown-view">${html.replace(/@@CODEBLOCK(\d+)@@/g, (_, index) => codeBlocks[Number(index)])}</div>`;
             currentJsonData = null;
             currentJsonMode = mode;
             currentViewerText = text;
             typeInfo.textContent = "markdown";
             viewMode.textContent = mode;
+            setTreeControlsVisible(false);
             setStatus("已按 Markdown 展示", "ok");
         }
 
@@ -967,7 +1439,21 @@
             currentViewerText = "";
             viewer.textContent = "等待 JSON 内容...";
             typeInfo.textContent = "未解析";
-            viewMode.textContent = "格式化预览";
+            viewMode.textContent = diffMode ? "差异对比" : "格式化预览";
+            setTreeControlsVisible(false);
+        }
+
+        function collectContainerPaths(value, path = "root", acc = []) {
+            if (value && typeof value === "object") {
+                acc.push(path);
+                const entries = Array.isArray(value)
+                    ? value.map((item, index) => [String(index), item])
+                    : Object.entries(value);
+                for (const [key, child] of entries) {
+                    collectContainerPaths(child, `${path}.${key}`, acc);
+                }
+            }
+            return acc;
         }
 
         function formatJsonPrimitive(value) {
@@ -1019,7 +1505,7 @@
             if (collapsed) {
                 return `
                     <div class="json-tree-row">
-                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-label="展开">▸</button>
+                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-expanded="false" aria-label="展开">▸</button>
                         <div>${keyHtml}<span class="json-punctuation">${bracketOpen}</span><span class="json-summary">${getContainerSummary(value)}</span><span class="json-punctuation">${bracketClose}</span></div>
                     </div>
                 `;
@@ -1032,7 +1518,7 @@
             return `
                 <div class="json-tree-node">
                     <div class="json-tree-row">
-                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-label="折叠">▾</button>
+                        <button type="button" class="json-toggle" data-toggle-path="${path}" aria-expanded="true" aria-label="折叠">▾</button>
                         <div>${keyHtml}<span class="json-punctuation">${bracketOpen}</span></div>
                     </div>
                     <div class="json-tree-children">${children}</div>
@@ -1071,6 +1557,10 @@
 
         function previewText(text) {
             return text.replace(/\s+/g, " ").slice(0, 96) || "(空内容)";
+        }
+
+        function makeHistoryTitle(content) {
+            return content.replace(/\s+/g, " ").trim().slice(0, 28) || "(空内容)";
         }
 
         function historyToJsonl(items) {
@@ -1230,7 +1720,7 @@
             historyList.innerHTML = items.map((item) => `
                 <div class="history-item" data-id="${item.id}">
                     <div class="history-item-head">
-                        <div class="history-title">${item.title}</div>
+                        <div class="history-title">${escapeHtml(item.title || "")}</div>
                         <div class="history-time">${formatTime(item.timestamp)}</div>
                     </div>
                     <div class="history-preview">${escapeHtml(previewText(item.content))}</div>
@@ -1253,20 +1743,12 @@
             const items = getHistory();
             items.unshift({
                 id: now.toString(),
-                title: `记录 ${items.length + 1}`,
+                title: makeHistoryTitle(content),
                 timestamp: now,
                 content
             });
             await setHistory(items, { persistFile: true });
             setStatus(boundDirectoryHandle ? "已保存到历史并同步 jsonl" : "已保存到历史", "ok");
-        }
-
-        function parseJsonFromInput() {
-            const raw = input.value.trim();
-            if (!raw) {
-                throw new Error("输入为空");
-            }
-            return JSON.parse(raw);
         }
 
         function restoreEscapedText(raw) {
@@ -1287,44 +1769,76 @@
             return JSON.parse(`"${normalized}"`);
         }
 
-        document.getElementById("parseBtn").addEventListener("click", () => {
+        function describeParseError(raw, error) {
+            const match = /position (\d+)/.exec(error.message);
+            if (!match) {
+                return { message: error.message, position: null };
+            }
+            const position = Number(match[1]);
+            const before = raw.slice(0, position);
+            const line = before.split(/\n/).length;
+            const col = position - (before.lastIndexOf("\n") + 1) + 1;
+            return { message: `${error.message}（第 ${line} 行，第 ${col} 列）`, position };
+        }
+
+        function handleParseError(raw, error, prefix) {
+            const info = describeParseError(raw, error);
+            setStatus(`${prefix}：${info.message}`, "error");
+            if (info.position !== null) {
+                input.focus();
+                try {
+                    input.setSelectionRange(info.position, info.position);
+                } catch {
+                    /* selection not supported */
+                }
+            }
+        }
+
+        function formatAction() {
+            const raw = input.value;
+            if (!raw.trim()) {
+                setStatus("输入为空", "error");
+                return;
+            }
             try {
-                const obj = parseJsonFromInput();
+                const obj = JSON.parse(raw);
                 input.value = JSON.stringify(obj, null, 2);
+                syncActiveContent();
+                schedulePersistDocs();
                 renderJson(obj, "格式化预览");
                 updateMetrics();
             } catch (error) {
-                setStatus(`解析失败：${error.message}`, "error");
+                handleParseError(raw, error, "解析失败");
             }
-        });
+        }
 
-        document.getElementById("compressBtn").addEventListener("click", () => {
+        function compressAction() {
+            const raw = input.value;
+            if (!raw.trim()) {
+                setStatus("输入为空", "error");
+                return;
+            }
             try {
-                const obj = parseJsonFromInput();
-                const compact = JSON.stringify(obj);
-                input.value = compact;
+                const obj = JSON.parse(raw);
+                input.value = JSON.stringify(obj);
+                syncActiveContent();
+                schedulePersistDocs();
                 renderJson(obj, "压缩源对应预览");
                 updateMetrics();
             } catch (error) {
-                setStatus(`压缩失败：${error.message}`, "error");
+                handleParseError(raw, error, "压缩失败");
             }
-        });
+        }
 
-        document.getElementById("formatBtn").addEventListener("click", () => {
-            try {
-                const obj = parseJsonFromInput();
-                input.value = JSON.stringify(obj, null, 2);
-                renderJson(obj, "格式化预览");
-                updateMetrics();
-            } catch (error) {
-                setStatus(`格式化失败：${error.message}`, "error");
-            }
-        });
+        document.getElementById("formatBtn").addEventListener("click", formatAction);
+        document.getElementById("compressBtn").addEventListener("click", compressAction);
 
         document.getElementById("restoreEscapesBtn").addEventListener("click", () => {
             try {
                 const restored = restoreEscapedText(input.value);
                 input.value = restored;
+                syncActiveContent();
+                schedulePersistDocs();
                 updateMetrics();
 
                 try {
@@ -1348,49 +1862,74 @@
             renderMarkdown(input.value, "Markdown 预览");
         });
 
-        document.getElementById("validateBtn").addEventListener("click", () => {
-            try {
-                const obj = parseJsonFromInput();
-                renderJson(obj, "校验通过预览");
-                updateMetrics();
-            } catch (error) {
-                setStatus(`校验失败：${error.message}`, "error");
-            }
-        });
-
         document.getElementById("clearInputBtn").addEventListener("click", () => {
+            const snapshot = input.value;
+            if (!snapshot) {
+                setStatus("输入已为空");
+                return;
+            }
             input.value = "";
+            syncActiveContent();
+            schedulePersistDocs();
             updateMetrics();
             setStatus("已清空输入");
-        });
-
-        document.getElementById("clearViewerBtn").addEventListener("click", () => {
-            resetViewer();
-            setStatus("已清空预览");
+            showToast("已清空输入", {
+                actionLabel: "撤销",
+                onAction: () => {
+                    input.value = snapshot;
+                    syncActiveContent();
+                    schedulePersistDocs();
+                    updateMetrics();
+                    setStatus("已恢复输入", "ok");
+                }
+            });
         });
 
         document.getElementById("clearAllBtn").addEventListener("click", () => {
+            const snapshot = input.value;
             input.value = "";
+            syncActiveContent();
+            schedulePersistDocs();
             resetViewer();
-            setStatus("已全部清空");
             updateMetrics();
+            setStatus("已全部清空");
+            if (snapshot) {
+                showToast("已全部清空", {
+                    actionLabel: "撤销",
+                    onAction: () => {
+                        input.value = snapshot;
+                        syncActiveContent();
+                        schedulePersistDocs();
+                        updateMetrics();
+                        setStatus("已恢复输入", "ok");
+                    }
+                });
+            }
         });
 
-        document.getElementById("copyBtn").addEventListener("click", async () => {
+        const copyBtn = document.getElementById("copyBtn");
+        copyBtn.addEventListener("click", async () => {
             try {
                 await navigator.clipboard.writeText(input.value);
+                flashButton(copyBtn, "已复制 ✓");
                 setStatus("已复制到剪贴板", "ok");
             } catch {
                 setStatus("复制失败，请手动复制", "error");
             }
         });
 
+        function sanitizeFileName(name) {
+            return (name || "data").replace(/[\\/:*?"<>|]/g, "_").trim() || "data";
+        }
+
         document.getElementById("downloadBtn").addEventListener("click", () => {
             const blob = new Blob([input.value], { type: "application/json;charset=utf-8" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
+            const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+            const base = sanitizeFileName(activeDoc() ? activeDoc().name : "data");
             link.href = url;
-            link.download = "data.json";
+            link.download = `${base}-${stamp}.json`;
             link.click();
             URL.revokeObjectURL(url);
             setStatus("已导出 JSON 文件", "ok");
@@ -1403,10 +1942,14 @@
             }
             try {
                 input.value = await file.text();
+                syncActiveContent();
+                schedulePersistDocs();
                 setStatus(`已导入：${file.name}`, "ok");
                 updateMetrics();
             } catch (error) {
                 setStatus(`导入失败：${error.message}`, "error");
+            } finally {
+                fileInput.value = "";
             }
         });
 
@@ -1450,9 +1993,21 @@
         });
 
         document.getElementById("clearHistoryBtn").addEventListener("click", async () => {
+            const snapshot = getHistory().slice();
+            if (!snapshot.length) {
+                setStatus("历史已为空");
+                return;
+            }
             try {
                 await setHistory([]);
                 setStatus("已清空历史");
+                showToast("已清空历史", {
+                    actionLabel: "撤销",
+                    onAction: async () => {
+                        await setHistory(snapshot);
+                        setStatus("已恢复历史", "ok");
+                    }
+                });
             } catch (error) {
                 setStatus(`清空历史失败：${error.message}`, "error");
             }
@@ -1478,6 +2033,8 @@
                     return;
                 }
                 input.value = item.content;
+                syncActiveContent();
+                schedulePersistDocs();
                 updateMetrics();
                 setStatus("已恢复历史记录", "ok");
                 return;
@@ -1512,26 +2069,268 @@
             renderJson(currentJsonData, currentJsonMode || "格式化预览");
         });
 
-        copyViewerBtn.addEventListener("click", async () => {
+        async function copyViewerResult() {
             if (!currentViewerText) {
                 setStatus("当前没有可复制的查看结果", "error");
                 return;
             }
             try {
                 await navigator.clipboard.writeText(currentViewerText);
+                flashButton(copyViewerBtn, "已复制 ✓");
                 setStatus("已复制查看结果", "ok");
             } catch {
                 setStatus("复制查看结果失败", "error");
             }
+        }
+
+        copyViewerBtn.addEventListener("click", copyViewerResult);
+
+        expandAllBtn.addEventListener("click", () => {
+            if (!currentJsonData || typeof currentJsonData !== "object") {
+                return;
+            }
+            collapsedJsonPaths = new Set();
+            renderJson(currentJsonData, currentJsonMode || "格式化预览");
         });
 
-        input.addEventListener("input", updateMetrics);
+        collapseAllBtn.addEventListener("click", () => {
+            if (!currentJsonData || typeof currentJsonData !== "object") {
+                return;
+            }
+            collapsedJsonPaths = new Set(collectContainerPaths(currentJsonData));
+            renderJson(currentJsonData, currentJsonMode || "格式化预览");
+        });
+
+        function tryAutoFormat() {
+            const raw = input.value.trim();
+            if (!raw) {
+                return;
+            }
+            try {
+                const obj = JSON.parse(raw);
+                input.value = JSON.stringify(obj, null, 2);
+                syncActiveContent();
+                schedulePersistDocs();
+                renderJson(obj, "格式化预览");
+                updateMetrics();
+            } catch {
+                /* not JSON, leave the pasted text as-is */
+            }
+        }
+
+        input.addEventListener("input", () => {
+            syncActiveContent();
+            schedulePersistDocs();
+            updateMetrics();
+        });
 
         input.addEventListener("paste", () => {
             requestAnimationFrame(() => {
+                syncActiveContent();
                 updateMetrics();
                 window.scrollTo({ top: 0, behavior: "smooth" });
+                tryAutoFormat();
             });
+        });
+
+        input.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            input.classList.add("drag-over");
+        });
+
+        input.addEventListener("dragleave", () => {
+            input.classList.remove("drag-over");
+        });
+
+        input.addEventListener("drop", async (event) => {
+            event.preventDefault();
+            input.classList.remove("drag-over");
+            const file = event.dataTransfer && event.dataTransfer.files[0];
+            if (!file) {
+                return;
+            }
+            try {
+                input.value = await file.text();
+                syncActiveContent();
+                schedulePersistDocs();
+                updateMetrics();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                setStatus(`已导入：${file.name}`, "ok");
+            } catch (error) {
+                setStatus(`导入失败：${error.message}`, "error");
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            const mod = event.ctrlKey || event.metaKey;
+            if (mod && event.key === "Enter") {
+                event.preventDefault();
+                formatAction();
+            } else if (mod && event.shiftKey && event.key.toLowerCase() === "c") {
+                event.preventDefault();
+                copyViewerResult();
+            } else if (event.key === "Escape" && document.activeElement === input && input.value) {
+                event.preventDefault();
+                document.getElementById("clearInputBtn").click();
+            }
+        });
+
+        // ---- Document tabs ----
+        docTabs.addEventListener("click", (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+            if (target.id === "addDocBtn") {
+                addDoc();
+                return;
+            }
+            const closeId = target.dataset.close;
+            if (closeId) {
+                event.stopPropagation();
+                closeDoc(closeId);
+                return;
+            }
+            const tab = target.closest(".doc-tab");
+            if (tab && tab.dataset.id) {
+                switchDoc(tab.dataset.id);
+            }
+        });
+
+        docTabs.addEventListener("dblclick", (event) => {
+            const target = event.target;
+            if (target instanceof HTMLElement && target.classList.contains("doc-tab-name")) {
+                renameDoc(target);
+            }
+        });
+
+        // ---- Diff comparison ----
+        function populateDiffSelects() {
+            const options = documents
+                .map((doc) => `<option value="${doc.id}">${escapeHtml(doc.name)}</option>`)
+                .join("");
+            diffLeft.innerHTML = options;
+            diffRight.innerHTML = options;
+            diffLeft.value = activeDocId;
+            const other = documents.find((doc) => doc.id !== activeDocId);
+            diffRight.value = other ? other.id : activeDocId;
+        }
+
+        function normalizeForDiff(text) {
+            try {
+                return JSON.stringify(JSON.parse(text), null, 2);
+            } catch {
+                return text;
+            }
+        }
+
+        function diffLines(aLines, bLines) {
+            const n = aLines.length;
+            const m = bLines.length;
+            const dp = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
+            for (let i = n - 1; i >= 0; i--) {
+                for (let j = m - 1; j >= 0; j--) {
+                    dp[i][j] = aLines[i] === bLines[j]
+                        ? dp[i + 1][j + 1] + 1
+                        : Math.max(dp[i + 1][j], dp[i][j + 1]);
+                }
+            }
+            const rows = [];
+            let i = 0;
+            let j = 0;
+            while (i < n && j < m) {
+                if (aLines[i] === bLines[j]) {
+                    rows.push({ type: "same", text: aLines[i] });
+                    i++;
+                    j++;
+                } else if (dp[i + 1][j] >= dp[i][j + 1]) {
+                    rows.push({ type: "del", text: aLines[i] });
+                    i++;
+                } else {
+                    rows.push({ type: "add", text: bLines[j] });
+                    j++;
+                }
+            }
+            while (i < n) {
+                rows.push({ type: "del", text: aLines[i++] });
+            }
+            while (j < m) {
+                rows.push({ type: "add", text: bLines[j++] });
+            }
+            return rows;
+        }
+
+        function renderDiff() {
+            const left = documents.find((doc) => doc.id === diffLeft.value);
+            const right = documents.find((doc) => doc.id === diffRight.value);
+            if (!left || !right) {
+                return;
+            }
+            const aLines = normalizeForDiff(left.content).split("\n");
+            const bLines = normalizeForDiff(right.content).split("\n");
+            if (aLines.length > DIFF_MAX_LINES || bLines.length > DIFF_MAX_LINES) {
+                viewer.innerHTML = `<div class="plain-text-view">内容过大，差异对比已跳过（超过 ${DIFF_MAX_LINES} 行）。</div>`;
+                typeInfo.textContent = "差异对比";
+                viewMode.textContent = "差异对比";
+                return;
+            }
+            const rows = diffLines(aLines, bLines);
+            const html = rows.map((row) => {
+                const cls = row.type === "add" ? "diff-add" : row.type === "del" ? "diff-del" : "diff-same";
+                const sign = row.type === "add" ? "+" : row.type === "del" ? "-" : " ";
+                return `<div class="diff-row ${cls}"><span class="diff-sign">${sign}</span><span class="diff-text">${escapeHtml(row.text) || " "}</span></div>`;
+            }).join("");
+            const adds = rows.filter((row) => row.type === "add").length;
+            const dels = rows.filter((row) => row.type === "del").length;
+            viewer.innerHTML = `<div class="diff-view">${html}</div>`;
+            currentJsonData = null;
+            currentViewerText = normalizeForDiff(right.content);
+            typeInfo.textContent = `+${adds} / -${dels}`;
+            viewMode.textContent = "差异对比";
+        }
+
+        function enterDiffMode() {
+            if (documents.length < 2) {
+                setStatus("至少需要两个文档才能对比，请先用 + 新建", "error");
+                return;
+            }
+            syncActiveContent();
+            diffMode = true;
+            diffControls.hidden = false;
+            setTreeControlsVisible(false);
+            populateDiffSelects();
+            renderDiff();
+            setStatus("差异对比中", "ok");
+        }
+
+        function exitDiffMode() {
+            diffMode = false;
+            diffControls.hidden = true;
+        }
+
+        diffBtn.addEventListener("click", () => {
+            if (diffMode) {
+                exitDiffMode();
+                resetViewer();
+                setStatus("已退出对比");
+            } else {
+                enterDiffMode();
+            }
+        });
+
+        diffClose.addEventListener("click", () => {
+            exitDiffMode();
+            resetViewer();
+            setStatus("已退出对比");
+        });
+
+        diffLeft.addEventListener("change", renderDiff);
+        diffRight.addEventListener("change", renderDiff);
+        diffSwap.addEventListener("click", () => {
+            const tmp = diffLeft.value;
+            diffLeft.value = diffRight.value;
+            diffRight.value = tmp;
+            renderDiff();
         });
 
         const backToTopBtn = document.getElementById("backToTopBtn");
@@ -1550,6 +2349,10 @@
 
         async function initApp() {
             applyTheme(getPreferredTheme());
+            loadDocs();
+            const doc = activeDoc();
+            input.value = doc ? doc.content : "";
+            renderTabs();
             historyItems = getHistoryFromLocalStorage();
             renderHistory();
             updateMetrics();
